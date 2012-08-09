@@ -1,0 +1,2 @@
+class MessageContent
+end
