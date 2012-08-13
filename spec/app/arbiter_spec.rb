@@ -2,17 +2,28 @@ require_relative '../../app/arbiter'
 
 describe Arbiter do
   let(:observer) { double(:observer, :subscribe_to => [:foo, :bar], :notify => true) }
-  let(:arbiter) { Arbiter.new([observer]) }
+  let(:arbiter) { Arbiter }
 
-  context '#publish' do
+  before(:each) do
+    arbiter.set_listeners([observer])
+  end
+
+  context '#perform' do
     it 'notifies observer of messages for which it is registered' do
       observer.should_receive(:notify).with(:foo, [1, 2])
-      arbiter.publish(:foo, [1, 2])
+      arbiter.perform(:foo, [1, 2])
     end
 
     it 'does not notify observers of messages for which they are not registered' do
       observer.should_not_receive(:notify)
-      arbiter.publish(:baz, [])
+      arbiter.perform(:baz, [])
+    end
+  end
+
+  context '#publish' do
+    it 'publishes the message to resque' do
+      Resque.should_receive(:enqueue).with(Arbiter, :a, [1,2])
+      arbiter.publish(:a, [1,2])
     end
   end
 end
