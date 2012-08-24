@@ -1,7 +1,4 @@
 class Arbiter
-
-  @queue = :arbiter
-
   def self.perform(message, metadata)
     message = message.to_sym
     if @message_table[message] and ! @message_table[message].empty?
@@ -19,6 +16,10 @@ class Arbiter
         @message_table[channel] << listener
       end
     end
+  end
+
+  def self.publish(message, metadata)
+    self.perform(message, metadata)
   end
 end
 

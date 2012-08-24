@@ -1,4 +1,4 @@
-require_relative '../../app/arbiter'
+require 'arbiter'
 
 describe Arbiter do
   let(:observer) { double(:observer, :subscribe_to => [:foo, :bar], :notify => true) }
@@ -21,8 +21,8 @@ describe Arbiter do
   end
 
   context '#publish' do
-    it 'publishes the message to resque' do
-      Resque.should_receive(:enqueue).with(Arbiter, :a, [1,2])
+    it 'publishes a message' do
+      arbiter.should_receive(:perform).with(:a, [1,2])
       arbiter.publish(:a, [1,2])
     end
   end
