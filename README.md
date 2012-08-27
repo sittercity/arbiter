@@ -1,6 +1,6 @@
 # Events
 
-This is merely a quick mockup of how an event system ought to work. It is not a framework, not an enforced interface, and not a gem.
+An eventing gem.
 
 ## Theory
 
