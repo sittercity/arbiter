@@ -9,6 +9,6 @@ Gem::Specification.new do |s|
   s.homepage = 'http://sittercity.com'
   s.summary = 'A simple eventing framework'
 
-  s.files = Dir['lib/**/*.rb']
-  s.require_paths = ['lib', 'spec']
+  s.files = Dir['lib/**/*.rb', 'app/*.rb']
+  s.require_paths = ['lib', 'spec', 'app']
 end
