@@ -17,11 +17,11 @@ This is the messaging 'driver.' When the underlying message framework changes, t
 To implement an arbiter, just extend the arbiter class and add a `self.publish` method:
 
 ```ruby
-  class ResqueArbiter < Arbiter
-    def self.publish(message, metadata)
-      Resque.enqueue(Arbiter, message, metadata)
-    end
+class ResqueArbiter < Arbiter
+  def self.publish(message, metadata)
+    Resque.enqueue(Arbiter, message, metadata)
   end
+end
 ```
 
 #### Setting Arbiter Listeners
@@ -29,7 +29,7 @@ To implement an arbiter, just extend the arbiter class and add a `self.publish` 
 You'll need to specify the classes to listen with on your arbiter driver. For example, if you were using the `ResqueArbiter`, you'd do this somewhere in your initialization of your application:
 
 ```ruby
-  ResqueArbiter.set_listeners([Classes, To, Listen, On])
+ResqueArbiter.set_listeners([Classes, To, Listen, On])
 ```
 
 ### Eventer
@@ -37,7 +37,7 @@ You'll need to specify the classes to listen with on your arbiter driver. For ex
 This is the application-side eventing component. It is a singleton or statically invoked throughout the app and understands how to talk to the arbiter. In your application, you need to add an arbiter to the Eventer bus:
 
 ```ruby
-  Eventer.bus = ResqueArbiter
+Eventer.bus = ResqueArbiter
 ```
 
 ### Publishing Events
@@ -50,7 +50,7 @@ It publish an event, use the `Eventer.post` method. It takes two arguments:
 For example
 
 ```ruby
-  Eventer.post(:account_created, account.to_hash)
+Eventer.post(:account_created, account.to_hash)
 ```
 
 Just a side note, it's not advised to push symbols into events, as they likely won't be received as symbols on the other side.
@@ -67,27 +67,27 @@ The `@subscribe_to` array tells the arbiter which events you want this class to 
 The `notify` method should inspect the `event` that comes in, and act accordingly. For example:
 
 ```ruby
-  class Postmaster
+class Postmaster
 
-    @subscribe_to = [:hello]
+  @subscribe_to = [:hello]
 
-    class << self
-      attr_accessor :router
-      attr_accessor :record
-      attr_reader :subscribe_to
-    end
+  class << self
+    attr_accessor :router
+    attr_accessor :record
+    attr_reader :subscribe_to
+  end
 
-    def self.send_hello(recipient_id)
-      # Send some email here
-    end
+  def self.send_hello(recipient_id)
+    # Send some email here
+  end
 
-    def self.notify(event, args)
-      case event
-      when :hello
-        send_hello(*args)
-      end
+  def self.notify(event, args)
+    case event
+    when :hello
+      send_hello(*args)
     end
   end
+end
 ```
 
 ## Available Arbiter Drivers
