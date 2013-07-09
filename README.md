@@ -2,6 +2,8 @@
 
 An eventing gem.
 
+[![Build Status](https://travis-ci.org/sittercity/arbiter.png)](https://travis-ci.org/sittercity/arbiter)
+
 ## Theory
 
 To briefly explain, we want to separate the application/business logic from the framework and runtime. This project is structured so that the application and business rules live in /lib while the framework and runtime components live in /app. events.rb is the bootstrap that kicks off everything.
@@ -16,21 +18,29 @@ This is the messaging 'driver.' When the underlying message framework changes, t
 
 To implement an arbiter, just extend the arbiter class and add a `self.publish` method:
 
-  class ResqueArbiter < Arbiter
-    def self.publish(message, metadata)
-      Resque.enqueue(Arbiter, message, metadata)
-    end
+```ruby
+class ResqueArbiter < Arbiter
+  def self.publish(message, metadata)
+    Resque.enqueue(Arbiter, message, metadata)
   end
+end
+```
 
 #### Setting Arbiter Listeners
 
-  ResqueArbiter.set_listeners([Classes, To, Listen, On])
+You'll need to specify the classes to listen with on your arbiter driver. For example, if you were using the `ResqueArbiter`, you'd do this somewhere in your initialization of your application:
+
+```ruby
+ResqueArbiter.set_listeners([Classes, To, Listen, On])
+```
 
 ### Eventer
 
 This is the application-side eventing component. It is a singleton or statically invoked throughout the app and understands how to talk to the arbiter. In your application, you need to add an arbiter to the Eventer bus:
 
-  Eventer.bus = ResqueArbiter
+```ruby
+Eventer.bus = ResqueArbiter
+```
 
 ### Publishing Events
 
@@ -41,7 +51,9 @@ It publish an event, use the `Eventer.post` method. It takes two arguments:
 
 For example
 
-  Eventer.post(:account_created, account.to_hash)
+```ruby
+Eventer.post(:account_created, account.to_hash)
+```
 
 Just a side note, it's not advised to push symbols into events, as they likely won't be received as symbols on the other side.
 
@@ -56,27 +68,29 @@ The `@subscribe_to` array tells the arbiter which events you want this class to 
 
 The `notify` method should inspect the `event` that comes in, and act accordingly. For example:
 
-  class Postmaster
+```ruby
+class Postmaster
 
-    @subscribe_to = [:hello]
+  @subscribe_to = [:hello]
 
-    class << self
-      attr_accessor :router
-      attr_accessor :record
-      attr_reader :subscribe_to
-    end
+  class << self
+    attr_accessor :router
+    attr_accessor :record
+    attr_reader :subscribe_to
+  end
 
-    def self.send_hello(recipient_id)
-      # Send some email here
-    end
+  def self.send_hello(recipient_id)
+    # Send some email here
+  end
 
-    def self.notify(event, args)
-      case event
-      when :hello
-        send_hello(*args)
-      end
+  def self.notify(event, args)
+    case event
+    when :hello
+      send_hello(*args)
     end
   end
+end
+```
 
 ## Available Arbiter Drivers
 
@@ -98,7 +112,7 @@ This is an Arbiter that uses ZeroMQ to send it's messages. This is by far the mo
 
 To run the backend, you'll need to start two processes:
 
- - `rake "arbiter:proxy[frontend_uri,backend_uri]"
+ - `rake "arbiter:proxy[frontend_uri,backend_uri]"`
  - `rake "arbiter:worker[backend_uri]"`
 
 The `frontend_uri` and `backend_uri` values above should conform to standard zmq addresses. You can use tcp, udp, ipc, or anything else that zmq supports. You must start the proxy first, and then connect the workers to the proxy. This allows you to scale the workers up and down as you see fit. For a light application, you'll probably only need one worker, but for very busy applications, you might need much more than that.
@@ -107,7 +121,7 @@ The `frontend_uri` and `backend_uri` values above should conform to standard zmq
 
 You'll need to setup some configuration in your app to use zeromq.
 
-Set the backend worker: `ZeromqArbiter.frontend = 'frontend_uri'
+Set the backend worker: `ZeromqArbiter.frontend = 'frontend_uri'`
 
 The address should be the frontend location of your proxy.
 
