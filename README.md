@@ -1,4 +1,4 @@
-# Events
+# Arbiter
 
 An eventing gem.
 
@@ -9,6 +9,7 @@ To briefly explain, we want to separate the application/business logic from the 
 ## Breakdown
 
 ### Arbiter
+
 This is the messaging 'driver.' When the underlying message framework changes, this also must change.
 
 #### Arbiter Drivers
@@ -26,9 +27,23 @@ To implement an arbiter, just extend the arbiter class and add a `self.publish` 
   ResqueArbiter.set_listeners([Classes, To, Listen, On])
 
 ### Eventer
+
 This is the application-side eventing component. It is a singleton or statically invoked throughout the app and understands how to talk to the arbiter. In your application, you need to add an arbiter to the Eventer bus:
 
   Eventer.bus = ResqueArbiter
+
+### Publishing Events
+
+It publish an event, use the `Eventer.post` method. It takes two arguments:
+
+ 1. The event name
+ 2. A hash of arguments to pass
+
+For example
+
+  Eventer.post(:account_created, account.to_hash)
+
+Just a side note, it's not advised to push symbols into events, as they likely won't be received as symbols on the other side.
 
 ## Listening on events
 
@@ -52,6 +67,7 @@ The `notify` method should inspect the `event` that comes in, and act accordingl
     end
 
     def self.send_hello(recipient_id)
+      # Send some email here
     end
 
     def self.notify(event, args)
@@ -61,3 +77,38 @@ The `notify` method should inspect the `event` that comes in, and act accordingl
       end
     end
   end
+
+## Available Arbiter Drivers
+
+These are the provided arbiter drivers:
+
+### In-Memory (Arbiter)
+
+The in-memory arbiter is the default, simplest driver. This is an in-memory arbiter, and is only really useful for testing. If you use this in production, it will handle events in-process, which probably isn't what you want.
+
+### Resque (ResqueArbiter)
+
+This is an Arbiter implementation that uses a Resque backend. You'll need a Resque worker running to process events. See the resque manual for details on this.
+
+### ZeroMQ (ZeromqArbiter)
+
+This is an Arbiter that uses ZeroMQ to send it's messages. This is by far the most advanced and powerful implementation, as you can use the power of zmq to setup any kind of messaging architecture you want.
+
+#### Running the backend
+
+To run the backend, you'll need to start two processes:
+
+ - `rake "arbiter:proxy[frontend_uri,backend_uri]"
+ - `rake "arbiter:worker[backend_uri]"`
+
+The `frontend_uri` and `backend_uri` values above should conform to standard zmq addresses. You can use tcp, udp, ipc, or anything else that zmq supports. You must start the proxy first, and then connect the workers to the proxy. This allows you to scale the workers up and down as you see fit. For a light application, you'll probably only need one worker, but for very busy applications, you might need much more than that.
+
+#### Configuring ZeromqArbiter
+
+You'll need to setup some configuration in your app to use zeromq.
+
+Set the backend worker: `ZeromqArbiter.frontend = 'frontend_uri'
+
+The address should be the frontend location of your proxy.
+
+You can also set a logger for it if you wish: `ZeromqArbiter.logger = Logger`

@@ -2,7 +2,11 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.3)
+    ffi (1.9.0)
+    ffi-rzmq (1.0.1)
+      ffi
     multi_json (1.3.6)
+    oj (2.0.10)
     rack (1.4.1)
     rack-protection (1.2.0)
       rack
@@ -35,6 +39,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  rake
-  resque
-  rspec
+  ffi-rzmq (~> 1.0)
+  oj (~> 2.0)
+  rake (~> 0.9)
+  resque (~> 1.21)
+  rspec (~> 2.11)
