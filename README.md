@@ -2,6 +2,8 @@
 
 An eventing gem.
 
+[![Build Status](https://travis-ci.org/sittercity/arbiter.png)](https://travis-ci.org/sittercity/arbiter)
+
 ## Theory
 
 To briefly explain, we want to separate the application/business logic from the framework and runtime. This project is structured so that the application and business rules live in /lib while the framework and runtime components live in /app. events.rb is the bootstrap that kicks off everything.
