@@ -16,21 +16,29 @@ This is the messaging 'driver.' When the underlying message framework changes, t
 
 To implement an arbiter, just extend the arbiter class and add a `self.publish` method:
 
+```ruby
   class ResqueArbiter < Arbiter
     def self.publish(message, metadata)
       Resque.enqueue(Arbiter, message, metadata)
     end
   end
+```
 
 #### Setting Arbiter Listeners
 
+You'll need to specify the classes to listen with on your arbiter driver. For example, if you were using the `ResqueArbiter`, you'd do this somewhere in your initialization of your application:
+
+```ruby
   ResqueArbiter.set_listeners([Classes, To, Listen, On])
+```
 
 ### Eventer
 
 This is the application-side eventing component. It is a singleton or statically invoked throughout the app and understands how to talk to the arbiter. In your application, you need to add an arbiter to the Eventer bus:
 
+```ruby
   Eventer.bus = ResqueArbiter
+```
 
 ### Publishing Events
 
@@ -41,7 +49,9 @@ It publish an event, use the `Eventer.post` method. It takes two arguments:
 
 For example
 
+```ruby
   Eventer.post(:account_created, account.to_hash)
+```
 
 Just a side note, it's not advised to push symbols into events, as they likely won't be received as symbols on the other side.
 
@@ -56,6 +66,7 @@ The `@subscribe_to` array tells the arbiter which events you want this class to 
 
 The `notify` method should inspect the `event` that comes in, and act accordingly. For example:
 
+```ruby
   class Postmaster
 
     @subscribe_to = [:hello]
@@ -77,6 +88,7 @@ The `notify` method should inspect the `event` that comes in, and act accordingl
       end
     end
   end
+```
 
 ## Available Arbiter Drivers
 
@@ -98,7 +110,7 @@ This is an Arbiter that uses ZeroMQ to send it's messages. This is by far the mo
 
 To run the backend, you'll need to start two processes:
 
- - `rake "arbiter:proxy[frontend_uri,backend_uri]"
+ - `rake "arbiter:proxy[frontend_uri,backend_uri]"`
  - `rake "arbiter:worker[backend_uri]"`
 
 The `frontend_uri` and `backend_uri` values above should conform to standard zmq addresses. You can use tcp, udp, ipc, or anything else that zmq supports. You must start the proxy first, and then connect the workers to the proxy. This allows you to scale the workers up and down as you see fit. For a light application, you'll probably only need one worker, but for very busy applications, you might need much more than that.
@@ -107,7 +119,7 @@ The `frontend_uri` and `backend_uri` values above should conform to standard zmq
 
 You'll need to setup some configuration in your app to use zeromq.
 
-Set the backend worker: `ZeromqArbiter.frontend = 'frontend_uri'
+Set the backend worker: `ZeromqArbiter.frontend = 'frontend_uri'`
 
 The address should be the frontend location of your proxy.
 
