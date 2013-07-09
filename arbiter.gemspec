@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.version = '1.0.0'
   s.authors = ['Sitter City']
   s.email = ['dev@sittercity.com']
-  s.homepage = 'http://sittercity.com'
+  s.homepage = 'https://github.com/sittercity/arbiter'
   s.summary = 'A simple eventing framework'
 
   s.files = Dir['lib/**/*.rb']
