@@ -21,6 +21,7 @@ describe ZeromqArbiter do
 
   it 'sends a message to a zmq socket' do
     zmq_context.should_receive(:socket).with(ZMQ::PUSH).and_return(socket)
+    zmq_context.should_receive(:terminate)
     socket.should_receive(:connect).with(frontend)
     socket.should_receive(:close)
 
@@ -33,8 +34,10 @@ describe ZeromqArbiter do
 
     it 'receives a message and pushes it to the listener classes' do
       zmq_context.should_receive(:socket).with(ZMQ::PULL).and_return(socket)
+      zmq_context.should_receive(:terminate)
       socket.should_receive(:connect).with(frontend).and_return(0)
       socket.should_receive(:close)
+
       msg = ''
       return_values = [0, -1].to_enum
       socket.stub(:recv_string) do |msg|
@@ -49,6 +52,7 @@ describe ZeromqArbiter do
 
     it 'raises an error if connect fails' do
       zmq_context.should_receive(:socket).with(ZMQ::PULL).and_return(socket)
+      # FIXME zmq_context.should_receive(:terminate)
       socket.should_receive(:connect).with(frontend).and_return(-1)
 
       lambda { subject.listen(frontend) }.should raise_error {|e|
@@ -63,6 +67,7 @@ describe ZeromqArbiter do
       logger.should_receive(:error).any_number_of_times
 
       zmq_context.should_receive(:socket).with(ZMQ::PULL).and_return(socket)
+      zmq_context.should_receive(:terminate)
       socket.should_receive(:connect).with(frontend).and_return(0)
       socket.should_receive(:close)
       socket.stub(:recv_string).and_return(-1)
@@ -81,6 +86,7 @@ describe ZeromqArbiter do
       end
 
       zmq_context.should_receive(:socket).with(ZMQ::PULL).and_return(socket)
+      zmq_context.should_receive(:terminate)
       socket.should_receive(:connect).with(frontend).and_return(0)
       socket.should_receive(:close)
 
