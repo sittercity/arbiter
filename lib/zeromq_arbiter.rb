@@ -22,6 +22,7 @@ class ZeromqArbiter < Arbiter
     )
 
     outbound.close
+    context.terminate
   end
 
   def listen(proxy)
@@ -47,6 +48,7 @@ class ZeromqArbiter < Arbiter
     end
 
     socket.close
+    ctx.terminate
   end
 
   protected
