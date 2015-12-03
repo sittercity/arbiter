@@ -73,4 +73,9 @@ describe Zeromq::Majordomo::AsynchronousArbiter do
     subject.publish(:some_method, :some_arg)
     broker_thread.join
   end
+
+  it 'does not attempt disconnect if socket connection failed' do
+    zmq_context.should_receive(:socket).and_raise(StandardError)
+    lambda { subject.publish(:some_method, :some_arg) }.should raise_error(StandardError)
+  end
 end

@@ -18,7 +18,7 @@ module Zeromq
           ['', 'MDPC01', @md_service, method.to_s, Marshal.dump(params)]
         ))
       ensure
-        disconnect(sock)
+        disconnect(sock) if sock
       end
 
       private
