@@ -104,25 +104,31 @@ The in-memory arbiter is the default, simplest driver. This is an in-memory arbi
 
 This is an Arbiter implementation that uses a Resque backend. You'll need a Resque worker running to process events. See the resque manual for details on this.
 
-### ZeroMQ (ZeromqArbiter)
+### ZeroMQ Majordomo (Zeromq::Majordomo::AsynchronousArbiter)
 
-This is an Arbiter that uses ZeroMQ to send it's messages. This is by far the most advanced and powerful implementation, as you can use the power of zmq to setup any kind of messaging architecture you want.
+This is an Arbiter that uses ZeroMQ and the [Majordomo Protocol](http://rfc.zeromq.org/spec:7) to send it's messages. It submits asynchronously to dispatch work via a broker (which is not provided by this gem). You must also have majordomo workers receiving and processing the work (workers are also not provided).
 
-#### Running the backend
+#### Configuring Zeromq::Majordomo::AsynchronousArbiter
 
-To run the backend, you'll need to start two processes:
+You'll need to setup some configuration in your app to use this arbiter.
 
- - `rake "arbiter:proxy[frontend_uri,backend_uri]"`
- - `rake "arbiter:worker[backend_uri]"`
+* Address: The address of the Majordomo broker
+* ZMQ Context: the ZMQ context implementation
+* Timeout: timeout in seconds
+* MD Service: The service name to use with Majordomo. This is how messages are routed.
 
-The `frontend_uri` and `backend_uri` values above should conform to standard zmq addresses. You can use tcp, udp, ipc, or anything else that zmq supports. You must start the proxy first, and then connect the workers to the proxy. This allows you to scale the workers up and down as you see fit. For a light application, you'll probably only need one worker, but for very busy applications, you might need much more than that.
+Example:
 
-#### Configuring ZeromqArbiter
+```ruby
+require 'arbiter'
+require 'ffi-rzmq'
 
-You'll need to setup some configuration in your app to use zeromq.
-
-Set the backend worker: `ZeromqArbiter.frontend = 'frontend_uri'`
-
-The address should be the frontend location of your proxy.
-
-You can also set a logger for it if you wish: `ZeromqArbiter.logger = Logger`
+class ZeromqConfig
+  arbiter = Zeromq::Majordomo::AsynchronousArbiter.new(
+              "tcp://192.168.1.1:9292",
+              ZMQ::Context.new,
+              5,
+              "some-service-name-v1"
+           )
+end
+```
