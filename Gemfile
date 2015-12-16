@@ -4,7 +4,7 @@ gem 'resque', '~>1.21'
 gem "ffi-rzmq", "~>2.0"
 
 group :development do
-  gem 'rspec', '~>2.11'
+  gem 'rspec', '~>2.99'
   gem 'oj', '~>2.0'
   gem 'rake', '~>0.9'
 end
