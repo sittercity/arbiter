@@ -1,4 +1,5 @@
 require 'ffi-rzmq'
+require 'multi_json'
 
 module Zeromq
   module Majordomo
@@ -15,7 +16,7 @@ module Zeromq
       def publish(method, params)
         sock = connect
         assert_zmq_ok(sock.send_strings(
-          ['', 'MDPC01', @md_service, method.to_s, Marshal.dump(params)]
+          ['', 'MDPC01', @md_service, method.to_s, MultiJson.dump(params)]
         ))
       ensure
         disconnect(sock) if sock
