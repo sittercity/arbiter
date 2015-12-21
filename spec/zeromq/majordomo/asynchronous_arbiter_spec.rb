@@ -24,7 +24,7 @@ describe Zeromq::Majordomo::AsynchronousArbiter do
 
     it 'sends an MDP client request on the reply socket' do
       socket.should_receive(:send_strings).with([
-        '', 'MDPC01', version, 'rpc-method', Marshal.dump(:foo => :body)
+        '', 'MDPC01', version, 'rpc-method', MultiJson.dump(:foo => :body)
       ]).and_return(0)
 
       subject.publish('rpc-method', :foo => :body)
@@ -32,7 +32,7 @@ describe Zeromq::Majordomo::AsynchronousArbiter do
 
     it 'sends twice without blocking' do
       socket.should_receive(:send_strings).with([
-        '', 'MDPC01', version, 'some_method', Marshal.dump(:some_arg)
+        '', 'MDPC01', version, 'some_method', MultiJson.dump(:some_arg)
       ]).at_least(2).times.and_return(0)
 
       subject.publish(:some_method, :some_arg)
@@ -41,7 +41,7 @@ describe Zeromq::Majordomo::AsynchronousArbiter do
 
     it 'works with a Symbol method' do
       socket.should_receive(:send_strings).with([
-        '', 'MDPC01', version, 'some_method', Marshal.dump(:some_arg)
+        '', 'MDPC01', version, 'some_method', MultiJson.dump(:some_arg)
       ]).times.and_return(0)
 
       subject.publish(:some_method, :some_arg)
