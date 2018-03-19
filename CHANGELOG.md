@@ -1,5 +1,9 @@
 # Arbiter
 
+## 3.0.1
+
+- Remove required dependencies
+
 ## 3.0.0
 
 - Changed away from ruby 'Marshal' in favor of sending parameters via 'MultiJSON' when communicating with Majordomo in the Async Arbiter.

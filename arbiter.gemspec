@@ -3,8 +3,8 @@ $:.unshift lib unless $:.include?(lib)
 
 Gem::Specification.new do |s|
   s.name = 'arbiter'
-  s.version = '3.0.0'
-  s.authors = ['Sitter City']
+  s.version = '3.0.1'
+  s.authors = ['Sittercity']
   s.email = ['dev@sittercity.com']
   s.homepage = 'https://github.com/sittercity/arbiter'
   s.summary = 'A simple eventing framework'
